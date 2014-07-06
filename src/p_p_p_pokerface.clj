@@ -1,10 +1,23 @@
 (ns p-p-p-pokerface)
 
+(def char->int {\T 10 \J 11 \Q 12 \K 13 \A 14})
+
+(char->int \Q)
+
+(Integer/valueOf "0")
+
 (defn rank [card]
-  nil)
+  (let [[rank suit] card]
+    (cond
+     (Character/isDigit rank) (Integer/valueOf (str rank))
+     :else (char->int rank))))
 
 (defn suit [card]
-  nil)
+  (let [[rank suit] card]
+    (str suit)))
+
+(suit "5H")
+(rank "AH")
 
 (defn pair? [hand]
   nil)
