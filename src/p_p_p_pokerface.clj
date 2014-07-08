@@ -123,5 +123,27 @@
 ;(straight-flush? low-ace-straight-flush-hand)  ;=> true
 ;(straight-flush? high-ace-straight-flush-hand) ;=> true
 
+(defn high-card? [hand]
+  true)
+
 (defn value [hand]
-  nil)
+  (let [checkers #{[high-card? 0]  [pair? 1]
+                 [two-pairs? 2]  [three-of-a-kind? 3]
+                 [straight? 4]   [flush? 5]
+                   [full-house? 6] [four-of-a-kind? 7]
+                   [straight-flush? 8]}]
+    (apply max (reduce (fn [vec, checker-score]
+                   (let [[checker score] checker-score]
+                     (conj vec (if (checker hand) score -1))))
+                     []
+                     checkers))))
+
+;(value high-seven)           ;=> 0
+;(value pair-hand)            ;=> 1
+;(value two-pairs-hand)       ;=> 2
+;(value three-of-a-kind-hand) ;=> 3
+;(value straight-hand)        ;=> 4
+;(value flush-hand)           ;=> 5
+;(value full-house-hand)      ;=> 6
+;(value four-of-a-kind-hand)  ;=> 7
+;(value straight-flush-hand)  ;=> 8
