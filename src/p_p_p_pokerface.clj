@@ -1,10 +1,6 @@
 (ns p-p-p-pokerface)
 
-(def char->int {\T 10 \J 11 \Q 12 \K 13 \A 14})
-
-(char->int \Q)
-
-(Integer/valueOf "0")
+(def char->int {\T 10, \J 11, \Q 12, \K 13, \A 14})
 
 (defn rank [card]
   (let [[rank suit] card]
@@ -20,24 +16,23 @@
     (str suit)))
 
 (defn suits [hand]
-  (map suits hand))
-
-(suit "5H")
-(rank "AH")
-
-((partial mod 15) 5)
-(mod 15 5)
-
-({:a 1 :b 2} :c 0)
+  (map suit hand))
 
 (defn frequencies [nums]
   (reduce (fn [map, val] (assoc map val (inc (map val 0))))
           {}
           nums))
 
-(frequencies [1 3 3 4 4 1])
+(defn consecutive? [nums]
+  (let [[first second _] nums]
+    (cond
+     (empty? nums) true
+     (empty? (rest nums)) true
+     (== second (inc first)) (consecutive? (rest nums))
+     :else false)))
 
-(rest [1 2 3])
+;(consecutive? [1 2 1])
+
 
 (def high-seven                   ["2H" "3S" "4C" "5C" "7D"])
 (def pair-hand                    ["2H" "2S" "4C" "5C" "7D"])
@@ -53,34 +48,15 @@
 (def low-ace-straight-flush-hand  ["2D" "3D" "4D" "5D" "AD"])
 (def high-ace-straight-flush-hand ["TS" "AS" "QS" "KS" "JS"])
 
+
 (defn any? [nums num]
   (cond
    (empty? nums) false
    (== (first nums) num) true
    :else (any? (rest nums) num)))
 
-(empty? (rest [1]))
-
-(any? (vals (frequencies [1 3 3 4 4 1])) 2)
-
 (defn pair? [hand]
   (any? (vals (frequencies (ranks hand))) 2))
-
-(any? (vals (frequencies (ranks high-seven))) 2)
-
-(pair? pair-hand)  ;=> true
-(pair? high-seven) ;=> false
-
-(ranks pair-hand)
-(any? (vals (frequencies (ranks high-seven))) 2)
-
-(any? [1 1 1 1 1] 2)
-
-(zipmap [1 2 3] (repeat true))
-
-(some {3 true} [3])
-
-(#{3} 4)
 
 (defn n-of-a-kind [n]
   (fn [hand]
@@ -93,28 +69,59 @@
 (defn four-of-a-kind? [hand]
   ((n-of-a-kind 4) hand))
 
-(four-of-a-kind? two-pairs-hand)      ;=> false
-(four-of-a-kind? four-of-a-kind-hand) ;=> true
-
-(three-of-a-kind? two-pairs-hand)       ;=> false
-(three-of-a-kind? three-of-a-kind-hand) ;=> true
-
-
-
 (defn flush? [hand]
-  nil)
+  (== 1 (count (set (suits hand)))))
 
 (defn full-house? [hand]
-  nil)
+  (and
+   (pair? hand)
+   (three-of-a-kind? hand)))
+
+;(vals (frequencies (ranks full-house-hand)))
+;(full-house? three-of-a-kind-hand) ;=> false
+;(full-house? full-house-hand)      ;=> true
 
 (defn two-pairs? [hand]
-  nil)
+  (let [[first second third] (sort (vals (frequencies (ranks hand))))]
+    (or (four-of-a-kind? hand)
+        (and
+         (== 2 second)
+         (== 2 third)))))
+
+(defn unique-ranks [hand]
+  (set (ranks hand)))
+(defn count-unique-ranks [hand]
+  (count (unique-ranks hand)))
+
+;(vals (frequencies (ranks two-pairs-hand)))
+;(two-pairs? two-pairs-hand)      ;=> true
+;(two-pairs? pair-hand)           ;=> false
+;(two-pairs? four-of-a-kind-hand) ;=> true
 
 (defn straight? [hand]
-  nil)
+  (cond
+   (not (== 5 (count-unique-ranks hand))) false
+   (consecutive? (sort (ranks hand))) true
+   (consecutive? (sort (replace {14 1}(ranks hand)))) true
+   :else false))
+
+;(sort (replace {14 1} (keys (frequencies [2 3 4 14]))))
+;(straight? two-pairs-hand)             ;=> false
+;(straight? straight-hand)              ;=> true
+;(straight? low-ace-straight-hand)      ;=> true
+;(straight? ["2H" "2D" "3H" "4H" "5H"]) ;=> false
+;(straight? high-ace-straight-hand)     ;=> true
 
 (defn straight-flush? [hand]
-  nil)
+  (and
+   (straight? hand)
+   (flush? hand)))
+
+;(straight-flush? straight-hand)                ;=> false
+;(straight-flush? flush-hand)                   ;=> false
+;(straight-flush? straight-flush-hand)          ;=> true
+;(straight-flush? low-ace-straight-flush-hand)  ;=> true
+;(straight-flush? high-ace-straight-flush-hand) ;=> true
 
 (defn value [hand]
   nil)
