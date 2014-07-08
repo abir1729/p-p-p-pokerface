@@ -76,11 +76,30 @@
 
 (any? [1 1 1 1 1] 2)
 
+(zipmap [1 2 3] (repeat true))
+
+(some {3 true} [3])
+
+(#{3} 4)
+
+(defn check-n-in-hand [n]
+  (fn [hand]
+    (any? (vals (frequencies (ranks hand))) n)))
+
 (defn three-of-a-kind? [hand]
-  nil)
+  ((check-n-in-hand 3) hand))
+
 
 (defn four-of-a-kind? [hand]
-  nil)
+  (any? (vals (frequencies (ranks hand))) 4))
+
+(four-of-a-kind? two-pairs-hand)      ;=> false
+(four-of-a-kind? four-of-a-kind-hand) ;=> true
+
+(three-of-a-kind? two-pairs-hand)       ;=> false
+(three-of-a-kind? three-of-a-kind-hand) ;=> true
+
+
 
 (defn flush? [hand]
   nil)
