@@ -82,16 +82,16 @@
 
 (#{3} 4)
 
-(defn check-n-in-hand [n]
+(defn n-of-a-kind [n]
   (fn [hand]
     (any? (vals (frequencies (ranks hand))) n)))
 
 (defn three-of-a-kind? [hand]
-  ((check-n-in-hand 3) hand))
+  ((n-of-a-kind 3) hand))
 
 
 (defn four-of-a-kind? [hand]
-  (any? (vals (frequencies (ranks hand))) 4))
+  ((n-of-a-kind 4) hand))
 
 (four-of-a-kind? two-pairs-hand)      ;=> false
 (four-of-a-kind? four-of-a-kind-hand) ;=> true
